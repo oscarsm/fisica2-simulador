@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel de simulaciones interactivas de Física 2">
+  <title>Simulador Física 2 · Panel</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+  <div class="aplicacion">
+    <aside class="barra-lateral" id="barra-lateral">
+      <a class="marca" href="#inicio" data-inicio>
+      
+        <span>Simulador Física 2</span>
+      </a>
+      <div class="barra-lateral__etiqueta">Unidades del curso</div>
+      <nav class="menu-panel" id="nav" aria-label="Navegación de unidades"></nav>
+      <div class="barra-lateral__pie">
+        <button class="boton-pruebas" id="abrir-pruebas" type="button" aria-haspopup="dialog" aria-controls="modal-pruebas" onclick="window.abrirModalPruebas && window.abrirModalPruebas()">
+          <i class="ti ti-test-pipe" aria-hidden="true"></i>
+          <span>Ejecutar pruebas</span>
+          <i class="ti ti-external-link" aria-hidden="true"></i>
+        </button>
+        <button class="tema" id="alternar-tema" type="button"><i class="ti ti-moon" aria-hidden="true"></i><span>Tema oscuro</span></button>
+        <small>Proyecto académico · Física 2</small>
+      </div>
+    </aside>
+    <div class="contenido">
+      <header class="barra-movil">
+        <button class="menu-movil" id="abrir-menu" type="button" aria-label="Abrir menú"><i class="ti ti-menu-2"></i></button>
+        <strong>Simulador Física 2</strong>
+        <span id="ruta-actual">Inicio</span>
+      </header>
+      <main id="contenido-principal">
+        <section class="inicio" id="inicio">
+          <h1>Explora, simula y<br><em>comprende</em> la física.</h1>
+          <p>Selecciona una unidad en el menú lateral. Sus módulos permanecerán visibles mientras trabajas y el experimento se abrirá aquí mismo.</p>
+          <div class="inicio__tarjetas"><div><i class="ti ti-chart-dots-3"></i><strong>Visualizaciones en vivo</strong><span>Observa cómo cambian las magnitudes al modificar los controles.</span></div><div><i class="ti ti-calculator"></i><strong>Resultados explicados</strong><span>Fórmulas, unidades del SI y valores en tiempo real.</span></div><div><i class="ti ti-device-desktop-analytics"></i><strong>Un solo panel</strong><span>Navega entre todas las unidades sin perder el contexto.</span></div></div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="js/ui/menu.js"></script>
+</body>
+</html>
