@@ -16,14 +16,14 @@ const unidades = [
     ["capacitores", "Simulador de capacitores", "Cómo cambia C al variar área, distancia y dieléctrico.", "ti-battery-charging"],
     ["energia", "Calculadora de energía almacenada", "Energía según voltaje y capacitancia.", "ti-bulb"]
   ]},
-  // { nombre: "Unidad 3 · Corriente y Ohm", color: "#BA7517", icono: "ti-plug", modulos: [
-  //   ["circuitos", "Simulador de circuitos", "Resistencias en serie, paralelo y mixto.", "ti-resistor"],
-  //   ["ohm", "Visualizador de ley de Ohm", "Relación entre V, I y R en tiempo real.", "ti-chart-line"]
-  // ]},
-  // { nombre: "Unidad 4 · Campo magnético", color: "#534AB7", icono: "ti-magnet", modulos: [
-  //   ["magnetico", "Simulador de campo magnético", "Líneas de campo de imanes y corrientes.", "ti-magnet"],
-  //   ["lorentz", "Simulador de fuerza de Lorentz", "Partícula en campos E y B cruzados.", "ti-rotate-clockwise"]
-  // ]}
+  { nombre: "Unidad 3 · Corriente y Ohm", color: "#BA7517", icono: "ti-plug", modulos: [
+    ["circuitos", "Simulador de circuitos", "Resistencias en serie, paralelo y mixto.", "ti-resistor"],
+    ["ohm", "Visualizador de ley de Ohm", "Relación entre V, I y R en tiempo real.", "ti-chart-line"]
+  ]},
+  { nombre: "Unidad 4 · Campo magnético", color: "#534AB7", icono: "ti-magnet", modulos: [
+    ["magnetico", "Simulador de campo magnético", "Líneas de campo de imanes y corrientes.", "ti-magnet"],
+    ["lorentz", "Simulador de fuerza de Lorentz", "Partícula en campos E y B cruzados.", "ti-rotate-clockwise"]
+  ]}
 ];
 
 // Referencias de infraestructura de la SPA.
