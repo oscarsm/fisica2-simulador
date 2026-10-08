@@ -16,14 +16,14 @@ const unidades = [
     ["capacitores", "Simulador de capacitores", "Cómo cambia C al variar área, distancia y dieléctrico.", "ti-battery-charging"],
     ["energia", "Calculadora de energía almacenada", "Energía según voltaje y capacitancia.", "ti-bulb"]
   ]},
-  { nombre: "Unidad 3 · Corriente y Ohm", color: "#BA7517", icono: "ti-plug", modulos: [
-    ["circuitos", "Simulador de circuitos", "Resistencias en serie, paralelo y mixto.", "ti-resistor"],
-    ["ohm", "Visualizador de ley de Ohm", "Relación entre V, I y R en tiempo real.", "ti-chart-line"]
-  ]},
-  { nombre: "Unidad 4 · Campo magnético", color: "#534AB7", icono: "ti-magnet", modulos: [
-    ["magnetico", "Simulador de campo magnético", "Líneas de campo de imanes y corrientes.", "ti-magnet"],
-    ["lorentz", "Simulador de fuerza de Lorentz", "Partícula en campos E y B cruzados.", "ti-rotate-clockwise"]
-  ]}
+  // { nombre: "Unidad 3 · Corriente y Ohm", color: "#BA7517", icono: "ti-plug", modulos: [
+  //   ["circuitos", "Simulador de circuitos", "Resistencias en serie, paralelo y mixto.", "ti-resistor"],
+  //   ["ohm", "Visualizador de ley de Ohm", "Relación entre V, I y R en tiempo real.", "ti-chart-line"]
+  // ]},
+  // { nombre: "Unidad 4 · Campo magnético", color: "#534AB7", icono: "ti-magnet", modulos: [
+  //   ["magnetico", "Simulador de campo magnético", "Líneas de campo de imanes y corrientes.", "ti-magnet"],
+  //   ["lorentz", "Simulador de fuerza de Lorentz", "Partícula en campos E y B cruzados.", "ti-rotate-clockwise"]
+  // ]}
 ];
 
 // Referencias de infraestructura de la SPA.
@@ -89,6 +89,7 @@ function crearMenu() {
         unidadAbierta = indice;
         cerrarOtras(indice);
         mostrarModulo(id, titulo, unidad);
+        cerrarMenuMovil();
       });
       subnav.append(enlace);
     });
@@ -600,9 +601,42 @@ function conectarControles(id) {
 }
 
 crearMenu();
-document.querySelector("[data-inicio]").addEventListener("click", (evento) => { evento.preventDefault(); principal.innerHTML = document.querySelector("#inicio").outerHTML; ruta.textContent = "Inicio"; });
-document.querySelector("#alternar-tema").addEventListener("click", () => { document.body.classList.toggle("tema-oscuro"); localStorage.setItem("tema", document.body.classList.contains("tema-oscuro") ? "oscuro" : "claro"); });
-document.querySelector("#abrir-menu").addEventListener("click", () => document.querySelector("#barra-lateral").classList.toggle("visible"));
+const barraLateral = document.querySelector("#barra-lateral");
+const botonMenu = document.querySelector("#abrir-menu");
+
+function cerrarMenuMovil() {
+  barraLateral.classList.remove("visible");
+  botonMenu.setAttribute("aria-expanded", "false");
+}
+
+document.querySelector("[data-inicio]").addEventListener("click", (evento) => {
+  evento.preventDefault();
+  principal.innerHTML = document.querySelector("#inicio").outerHTML;
+  ruta.textContent = "Inicio";
+  cerrarMenuMovil();
+});
+document.querySelector("#alternar-tema").addEventListener("click", () => {
+  document.body.classList.toggle("tema-oscuro");
+  localStorage.setItem("tema", document.body.classList.contains("tema-oscuro") ? "oscuro" : "claro");
+  cerrarMenuMovil();
+});
+botonMenu.setAttribute("aria-controls", "barra-lateral");
+botonMenu.setAttribute("aria-expanded", "false");
+botonMenu.addEventListener("click", () => {
+  const visible = barraLateral.classList.toggle("visible");
+  botonMenu.setAttribute("aria-expanded", String(visible));
+});
+document.addEventListener("click", (evento) => {
+  if (barraLateral.classList.contains("visible") && !barraLateral.contains(evento.target) && !botonMenu.contains(evento.target)) {
+    cerrarMenuMovil();
+  }
+});
+document.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape" && barraLateral.classList.contains("visible")) {
+    cerrarMenuMovil();
+    botonMenu.focus();
+  }
+});
 if (localStorage.getItem("tema") === "oscuro") document.body.classList.add("tema-oscuro");
 
 // Algoritmo de validación: ejecuta las fórmulas puras y presenta cada resultado
