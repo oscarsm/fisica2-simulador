@@ -19,12 +19,6 @@ lateral.
 - **Unidad 2 · Capacitores**
   - Simulador de capacitores y dieléctricos.
   - Calculadora de energía almacenada.
-- **Unidad 3 · Corriente y Ohm**
-  - Simulador de circuitos con dos resistencias en serie.
-  - Visualizador de la ley de Ohm.
-- **Unidad 4 · Campo magnético**
-  - Simulador de campo magnético.
-  - Simulador de fuerza de Lorentz.
 
 Las cuatro unidades están habilitadas en el menú actual. Los módulos se
 renderizan dinámicamente desde `js/ui/menu.js`.
@@ -97,12 +91,9 @@ fisica/
 - `js/ui/menu.js`: configuración de unidades, navegación, renderizado, eventos,
   Canvas, animaciones y modal de pruebas.
 - `js/fisica/calculos.js`: funciones puras reutilizables para capacitancia,
-  energía y ley de Ohm.
+  energía.
 - `js/tests/validacion.js`: pruebas básicas ejecutables en el navegador.
 - `pruebas.html`: página independiente de validación.
-- `INFORME-TECNICO.md`: fundamentos físicos, arquitectura y algoritmos.
-- `MANUAL-DE-USUARIO.docx`: manual editable en formato Word.
-- `MANUAL-DE-USUARIO.html`: versión editable del manual.
 - `js/app.js`: código legado de una versión anterior; la entrada actual carga
   `js/ui/menu.js`.
 
