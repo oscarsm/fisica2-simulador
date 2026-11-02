@@ -36,3 +36,68 @@ export function calcularCorriente(voltajeV, resistenciaOhm) {
   const resistencia = Number(resistenciaOhm);
   return resistencia > 0 ? Number(voltajeV) / resistencia : 0;
 }
+
+/** Resistencia equivalente de varias resistencias conectadas en paralelo. */
+export function calcularResistenciaParalelo(resistencias) {
+  const valores = resistencias.map(Number).filter((resistencia) => resistencia > 0);
+  if (valores.length === 0) return 0;
+  return 1 / valores.reduce((total, resistencia) => total + 1 / resistencia, 0);
+}
+
+/**
+ * Resuelve circuitos de dos o tres resistencias.
+ * La topología mixta es R1 en serie con el paralelo R2 || R3.
+ */
+export function calcularCircuitoResistivo(tipo, voltajeV, resistencias) {
+  const valores = resistencias.map((resistencia) => Math.max(0, Number(resistencia)));
+  const voltaje = Math.max(0, Number(voltajeV));
+  const [r1 = 0, r2 = 0, r3 = 0] = valores;
+  let resistenciaTotal = 0;
+  let corrientes = [0, 0, 0];
+  let voltajes = [0, 0, 0];
+
+  if (tipo === "paralelo") {
+    resistenciaTotal = calcularResistenciaParalelo([r1, r2, r3]);
+    const corrienteTotal = calcularCorriente(voltaje, resistenciaTotal);
+    corrientes = valores.map((resistencia) => calcularCorriente(voltaje, resistencia));
+    voltajes = valores.map(() => voltaje);
+    return {
+      resistenciaTotal,
+      corrienteTotal,
+      potenciaTotal: voltaje * corrienteTotal,
+      corrientes,
+      voltajes,
+      potencias: corrientes.map((corriente, indice) => voltajes[indice] * corriente)
+    };
+  }
+
+  if (tipo === "mixto") {
+    const paralelo = calcularResistenciaParalelo([r2, r3]);
+    resistenciaTotal = r1 + paralelo;
+    const corrienteTotal = calcularCorriente(voltaje, resistenciaTotal);
+    const voltajeParalelo = corrienteTotal * paralelo;
+    corrientes = [corrienteTotal, calcularCorriente(voltajeParalelo, r2), calcularCorriente(voltajeParalelo, r3)];
+    voltajes = [corrienteTotal * r1, voltajeParalelo, voltajeParalelo];
+    return {
+      resistenciaTotal,
+      corrienteTotal,
+      potenciaTotal: voltaje * corrienteTotal,
+      corrientes,
+      voltajes,
+      potencias: corrientes.map((corriente, indice) => voltajes[indice] * corriente)
+    };
+  }
+
+  resistenciaTotal = valores.reduce((total, resistencia) => total + resistencia, 0);
+  const corrienteTotal = calcularCorriente(voltaje, resistenciaTotal);
+  corrientes = valores.map(() => corrienteTotal);
+  voltajes = valores.map((resistencia) => corrienteTotal * resistencia);
+  return {
+    resistenciaTotal,
+    corrienteTotal,
+    potenciaTotal: voltaje * corrienteTotal,
+    corrientes,
+    voltajes,
+    potencias: corrientes.map((corriente, indice) => voltajes[indice] * corriente)
+  };
+}

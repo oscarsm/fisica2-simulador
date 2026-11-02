@@ -36,6 +36,7 @@ renderizan dinámicamente desde `js/ui/menu.js`.
 - Selector de planos `XY`, `XZ` y `YZ` para el potencial eléctrico.
 - Trayectorias animadas de electrones, protones y cargas personalizadas.
 - Simulación dinámica de capacitancia, carga y energía.
+- Simulador de resistencias en serie, paralelo y mixto, con corriente, voltaje y potencia por resistencia.
 - Animaciones de corriente, campo magnético y fuerza de Lorentz.
 - Fórmulas visibles junto a cada módulo.
 - Botón **Ejecutar pruebas** en el panel lateral.
@@ -51,8 +52,10 @@ V = k · q / r
 C = κ · ε₀ · A / d
 Q = C · V
 U = ½ · C · V²
-R_total = R₁ + R₂
+R_total = ΣRᵢ (serie)
+1/R_total = Σ(1/Rᵢ) (paralelo)
 I = V / R
+P = V · I
 B = μ₀ · I / (2πr)
 F = q · (E + v × B)
 ```

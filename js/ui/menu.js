@@ -2,7 +2,8 @@ import {
   calcularCapacitancia,
   calcularCorriente,
   calcularCorrienteSerie,
-  calcularEnergia
+  calcularEnergia,
+  calcularCircuitoResistivo
 } from "../fisica/calculos.js";
 
 // Configuración declarativa: añadir una unidad o módulo no requiere cambiar el renderizador.
@@ -16,10 +17,10 @@ const unidades = [
     ["capacitores", "Simulador de capacitores", "Cómo cambia C al variar área, distancia y dieléctrico.", "ti-battery-charging"],
     ["energia", "Calculadora de energía almacenada", "Energía según voltaje y capacitancia.", "ti-bulb"]
   ]},
-  // { nombre: "Unidad 3 · Corriente y Ohm", color: "#BA7517", icono: "ti-plug", modulos: [
-  //   ["circuitos", "Simulador de circuitos", "Resistencias en serie, paralelo y mixto.", "ti-resistor"],
-  //   ["ohm", "Visualizador de ley de Ohm", "Relación entre V, I y R en tiempo real.", "ti-chart-line"]
-  // ]},
+  { nombre: "Unidad 3 · Corriente y Ohm", color: "#BA7517", icono: "ti-plug", modulos: [
+    ["circuitos", "Simulador de circuitos", "Resistencias en serie, paralelo y mixto.", "ti-resistor"],
+    ["ohm", "Visualizador de ley de Ohm", "Relación entre V, I y R en tiempo real.", "ti-chart-line"]
+  ]},
   // { nombre: "Unidad 4 · Campo magnético", color: "#534AB7", icono: "ti-magnet", modulos: [
   //   ["magnetico", "Simulador de campo magnético", "Líneas de campo de imanes y corrientes.", "ti-magnet"],
   //   ["lorentz", "Simulador de fuerza de Lorentz", "Partícula en campos E y B cruzados.", "ti-rotate-clockwise"]
@@ -112,7 +113,7 @@ function pantallaBase(id, titulo, unidad, descripcion, contenido) {
     trayectoria: [["Fuerza eléctrica", "F = q · E", "N"], ["Segunda ley de Newton", "a = q · E / m", "m/s²"], ["Movimiento", "r(t) = r₀ + v₀t + ½at²", "m"]],
     capacitores: [["Capacitancia", "C = κ · ε₀ · A / d", "F"], ["Carga almacenada", "Q = C · V", "C"], ["Energía", "U = ½ · C · V²", "J"]],
     energia: [["Energía almacenada", "U = ½ · C · V²", "J"], ["Carga", "Q = C · V", "C"], ["Conversión", "1 J = 1000 mJ", "mJ"]],
-    circuitos: [["Ley de Ohm", "V = I · R", "V"], ["Resistencia en serie", "R_total = R₁ + R₂", "Ω"], ["Corriente", "I = V / R_total", "A"]],
+    circuitos: [["Ley de Ohm", "V = I · R", "V"], ["Equivalente serie", "Rₜ = ΣRᵢ", "Ω"], ["Equivalente paralelo", "1/Rₜ = Σ(1/Rᵢ)", "Ω"], ["Potencia", "P = V · I", "W"]],
     ohm: [["Ley de Ohm", "I = V / R", "A"], ["Voltaje", "V = I · R", "V"], ["Potencia", "P = V · I", "W"]],
     magnetico: [["Campo de un conductor", "B = μ₀ · I / (2πr)", "T"], ["Permeabilidad", "μ₀ = 4π × 10⁻⁷", "T·m/A"], ["Dirección", "Regla de la mano derecha", "—"]],
     lorentz: [["Fuerza de Lorentz", "F = q · (E + v × B)", "N"], ["Fuerza eléctrica", "Fₑ = q · E", "N"], ["Fuerza magnética", "Fᵦ = q · v × B", "N"]]
@@ -135,7 +136,7 @@ function mostrarModulo(id, titulo, unidad) {
   else if (id === "trayectoria") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Partícula <select id="particula"><option>Electrón</option><option>Protón</option><option>Personalizada</option></select></label></div><div class="control" id="control-carga-personalizada" hidden><label>Carga personalizada <output id="carga-personalizada-salida">1 e</output><input id="carga-personalizada" type="range" min="-3" max="3" value="1" step="1"></label></div><div class="control"><label>Velocidad inicial <output id="velocidad-salida">2.0 × 10⁶ m/s</output><input id="velocidad" type="range" min=".5" max="5" value="2" step=".1"></label></div><div class="control"><label>Campo uniforme <output id="campo-salida">500 N/C</output><input id="campo" type="range" min="100" max="2000" value="500" step="100"></label></div><div class="botones"><button class="boton" id="iniciar">Iniciar</button><button class="boton secundario" id="reiniciar">Reiniciar</button></div><div class="resultado"><small>Estado · tiempo</small><strong id="tiempo">En pausa · 0.00 ns</strong></div></div></div>`);
   else if (id === "capacitores") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Área <output id="area-salida">100 cm²</output><input id="area" type="range" min="20" max="200" value="100"></label></div><div class="control"><label>Distancia <output id="distancia-salida">2 mm</output><input id="distancia" type="range" min="1" max="20" value="2"></label></div><div class="control"><label>Voltaje <output id="voltaje-salida">12 V</output><input id="voltaje" type="range" min="1" max="100" value="12"></label></div><div class="control"><label>Dieléctrico <select id="dieletrico"><option value="1">Aire · κ=1</option><option value="5">Vidrio · κ=5</option><option value="80">Agua · κ=80</option></select></label></div><div class="resultado"><small>Capacitancia · carga · energía</small><strong id="lectura">Calculando...</strong></div></div></div>`);
   else if (id === "energia") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Capacitancia <input id="energia-c" type="number" value="100"> µF</label></div><div class="control"><label>Voltaje <input id="energia-v" type="number" value="12"> V</label></div><button class="boton" id="calcular">Calcular energía</button><div class="resultado"><small>U = ½ C V²</small><strong id="lectura">7.20 mJ</strong></div></div></div>`);
-  else if (id === "circuitos") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Resistencia R1 <output id="r1-salida">20 Ω</output><input id="r1" type="range" min="1" max="100" value="20"></label></div><div class="control"><label>Resistencia R2 <output id="r2-salida">30 Ω</output><input id="r2" type="range" min="1" max="100" value="30"></label></div><div class="control"><label>Voltaje de fuente <output id="fuente-salida">12 V</output><input id="fuente" type="range" min="1" max="24" value="12"></label></div><div class="resultado"><small>Modelo en serie · I = V/(R1+R2)</small><strong id="lectura">I = 0.24 A</strong></div></div></div><p class="nota">El circuito muestra el flujo de corriente y cambia en tiempo real al variar R1, R2 o la fuente.</p>`);
+  else if (id === "circuitos") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Tipo de circuito<select id="tipo-circuito"><option value="serie">Serie</option><option value="paralelo">Paralelo</option><option value="mixto">Mixto · R1 + (R2 ‖ R3)</option></select></label></div><div class="control"><label>Resistencia R1 <output id="r1-salida">20 Ω</output><input id="r1" type="range" min="1" max="100" value="20"></label></div><div class="control"><label>Resistencia R2 <output id="r2-salida">30 Ω</output><input id="r2" type="range" min="1" max="100" value="30"></label></div><div class="control" id="control-r3"><label>Resistencia R3 <output id="r3-salida">30 Ω</output><input id="r3" type="range" min="1" max="100" value="30"></label></div><div class="control"><label>Voltaje de fuente <output id="fuente-salida">12 V</output><input id="fuente" type="range" min="1" max="24" value="12"></label></div><div class="resultado"><small id="modelo-circuito">Serie · corriente total</small><strong id="lectura">I = 0.24 A</strong><span class="resultado-detalle" id="detalle-circuito"></span></div></div></div><p class="nota">Elige serie, paralelo o mixto. En cada caso se muestran la corriente, el voltaje y la potencia total y de cada resistencia.</p>`);
   else if (id === "ohm") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Voltaje <output id="voltaje-salida">12 V</output><input id="voltaje" type="range" min="1" max="24" value="12"></label></div><div class="control"><label>Resistencia <output id="resistencia-salida">20 Ω</output><input id="resistencia" type="range" min="1" max="100" value="20"></label></div><div class="resultado"><small>Corriente I = V / R</small><strong id="lectura">0.60 A</strong></div></div></div>`);
   else if (id === "magnetico") pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Intensidad de corriente <output id="corriente-salida">5 A</output><input id="corriente" type="range" min="1" max="20" value="5"></label></div><div class="control"><label>Dirección <select id="direccion"><option>Entrante</option><option>Saliente</option></select></label></div><div class="resultado"><small>Campo alrededor del conductor</small><strong id="lectura">B ∝ I / r</strong></div></div></div>`);
   else pantallaBase(id, titulo, unidad, descripcion, `<div class="experimento"><div class="experimento__visual"><canvas id="canvas-modulo"></canvas></div><div class="experimento__controles"><div class="control"><label>Campo eléctrico <output id="campo-e-salida">5 N/C</output><input id="campo-e" type="range" min="1" max="20" value="5"></label></div><div class="control"><label>Campo magnético <output id="campo-b-salida">1 T</output><input id="campo-b" type="range" min="1" max="10" value="1"></label></div><div class="resultado"><small>F = q(E + v × B)</small><strong id="lectura">F = 0 N</strong></div></div></div>`);
@@ -383,25 +384,130 @@ function dibujar(id, color) {
   }
   if (id === "circuitos" || id === "ohm") {
     const v = Number(document.querySelector("#fuente, #voltaje")?.value || 12);
-    const r = Number(document.querySelector("#r1")?.value || 20) + Number(document.querySelector("#r2")?.value || 30);
-    const corriente = id === "ohm" ? v / Number(document.querySelector("#resistencia")?.value || 20) : v / r;
+    const r1 = Number(document.querySelector("#r1")?.value || 20);
+    const r2 = Number(document.querySelector("#r2")?.value || 30);
+    const r3 = Number(document.querySelector("#r3")?.value || 30);
+    const tipo = document.querySelector("#tipo-circuito")?.value || "serie";
+    const circuito = id === "ohm" ? null : calcularCircuitoResistivo(tipo, v, [r1, r2, r3]);
+    const corriente = id === "ohm" ? v / Number(document.querySelector("#resistencia")?.value || 20) : circuito.corrienteTotal;
     const puntos = [w * .1, w * .25, w * .41, w * .59, w * .75, w * .9];
     ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(puntos[0], h * .5); ctx.lineTo(puntos[1], h * .5); ctx.stroke();
-    ctx.strokeRect(puntos[1], h * .42, w * .16, h * .16); ctx.moveTo(puntos[2], h * .5); ctx.lineTo(puntos[3], h * .5); ctx.stroke(); ctx.strokeRect(puntos[3], h * .42, w * .16, h * .16); ctx.moveTo(puntos[4], h * .5); ctx.lineTo(puntos[5], h * .5); ctx.stroke();
     if (id === "circuitos") {
       ctx.fillStyle = "#172231"; ctx.font = "600 13px system-ui"; ctx.textAlign = "center";
-      ctx.fillText(`R1 ${Number(document.querySelector("#r1")?.value || 20)} Ω`, puntos[1] + w * .08, h * .38);
-      ctx.fillText(`R2 ${Number(document.querySelector("#r2")?.value || 30)} Ω`, puntos[3] + w * .08, h * .38);
+      if (tipo === "serie") {
+        ctx.strokeRect(puntos[1], h * .42, w * .16, h * .16);
+        ctx.moveTo(puntos[2], h * .5); ctx.lineTo(puntos[3], h * .5); ctx.stroke();
+        ctx.strokeRect(puntos[3], h * .42, w * .16, h * .16);
+        ctx.moveTo(puntos[4], h * .5); ctx.lineTo(puntos[5], h * .5); ctx.stroke();
+        ctx.fillText(`R1 ${r1} Ω`, puntos[1] + w * .08, h * .38);
+        ctx.fillText(`R2 ${r2} Ω`, puntos[3] + w * .08, h * .38);
+      } else if (tipo === "paralelo") {
+        const entrada = w * .2; const salida = w * .8; const resistorX = w * .48;
+        const ramas = [h * .25, h * .5, h * .75];
+        ctx.moveTo(w * .1, h * .5); ctx.lineTo(entrada, h * .5); ctx.stroke();
+        ramas.forEach((y) => {
+          ctx.moveTo(entrada, h * .5); ctx.lineTo(entrada, y); ctx.lineTo(resistorX, y);
+          ctx.stroke(); ctx.strokeRect(resistorX, y - 14, w * .14, 28);
+          ctx.moveTo(resistorX + w * .14, y); ctx.lineTo(salida, y); ctx.lineTo(salida, h * .5); ctx.stroke();
+        });
+        ctx.moveTo(salida, h * .5); ctx.lineTo(w * .9, h * .5); ctx.stroke();
+        ctx.fillText(`R1 ${r1} Ω`, resistorX + w * .07, ramas[0] - 22);
+        ctx.fillText(`R2 ${r2} Ω`, resistorX + w * .07, ramas[1] - 22);
+        ctx.fillText(`R3 ${r3} Ω`, resistorX + w * .07, ramas[2] + 30);
+      } else {
+        const entrada = w * .25; const separacion = w * .45; const salida = w * .8;
+        ctx.moveTo(w * .1, h * .5); ctx.lineTo(entrada, h * .5); ctx.lineTo(entrada, h * .5); ctx.stroke();
+        ctx.strokeRect(entrada, h * .42, separacion - entrada, h * .16);
+        ctx.fillText(`R1 ${r1} Ω`, (entrada + separacion) / 2, h * .38);
+        const resistorX = w * .58; const resistorWidth = w * .14;
+        [h * .25, h * .75].forEach((y) => {
+          ctx.moveTo(separacion, h * .5); ctx.lineTo(separacion, y); ctx.lineTo(resistorX, y);
+          ctx.stroke();
+          ctx.strokeRect(resistorX, y - 14, resistorWidth, 28);
+          ctx.moveTo(resistorX + resistorWidth, y); ctx.lineTo(salida, y);
+          ctx.stroke();
+        });
+        ctx.fillText(`R2 ${r2} Ω`, w * .65, h * .25 - 22);
+        ctx.fillText(`R3 ${r3} Ω`, w * .65, h * .75 + 30);
+        ctx.moveTo(salida, h * .25); ctx.lineTo(salida, h * .5);
+        ctx.moveTo(salida, h * .75); ctx.lineTo(salida, h * .5);
+        ctx.lineTo(w * .9, h * .5); ctx.stroke();
+      }
     } else {
-      ctx.fillStyle = "#172231"; ctx.font = "600 13px system-ui"; ctx.textAlign = "center";
-      ctx.fillText(`V = ${v} V`, w * .18, h * .38);
-      ctx.fillText(`R = ${Number(document.querySelector("#resistencia")?.value || 20)} Ω`, w * .66, h * .38);
+      const resistencia = Number(document.querySelector("#resistencia")?.value || 20);
+      const izquierda = w * .2; const derecha = w * .82;
+      const arriba = h * .28; const abajo = h * .72;
+      const resistorInicio = w * .53; const resistorFin = w * .7;
+      ctx.beginPath();
+      ctx.moveTo(izquierda, arriba); ctx.lineTo(resistorInicio, arriba);
+      ctx.moveTo(resistorFin, arriba); ctx.lineTo(derecha, arriba);
+      ctx.lineTo(derecha, abajo); ctx.lineTo(izquierda, abajo);
+      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(izquierda, arriba); ctx.lineTo(izquierda, h * .42);
+      ctx.moveTo(izquierda, h * .58); ctx.lineTo(izquierda, abajo); ctx.stroke();
+      ctx.strokeStyle = "#ba7517"; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(izquierda - 18, h * .42); ctx.lineTo(izquierda + 18, h * .42); ctx.stroke();
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(izquierda - 27, h * .58); ctx.lineTo(izquierda + 27, h * .58); ctx.stroke();
+      ctx.strokeStyle = color; ctx.lineWidth = 3;
+      ctx.strokeRect(resistorInicio, arriba - 14, resistorFin - resistorInicio, 28);
+      ctx.fillStyle = "#172231"; ctx.font = "700 14px system-ui"; ctx.textAlign = "center";
+      ctx.fillText(`Fuente · ${v} V`, izquierda, h * .88);
+      ctx.fillText(`Resistencia · ${resistencia} Ω`, (resistorInicio + resistorFin) / 2, arriba - 25);
+      ctx.fillText(`I = ${corriente.toFixed(2)} A`, w * .5, h * .53);
+      ctx.font = "600 12px system-ui"; ctx.fillText("La corriente aumenta al subir V o disminuir R", w * .5, h * .94);
     }
     const fase = (id === "ohm" ? estadoVisual.circuitos.fase : estadoVisual.circuitos.fase) % 1;
+    const recorrerRuta = (puntosRuta, progreso) => {
+      const tramos = puntosRuta.slice(1).map((punto, indice) => Math.hypot(
+        punto[0] - puntosRuta[indice][0],
+        punto[1] - puntosRuta[indice][1]
+      ));
+      const longitudTotal = tramos.reduce((total, tramo) => total + tramo, 0);
+      let distancia = progreso * longitudTotal;
+      for (let indice = 0; indice < tramos.length; indice += 1) {
+        if (distancia <= tramos[indice]) {
+          const inicio = puntosRuta[indice]; const fin = puntosRuta[indice + 1];
+          const fraccion = tramos[indice] === 0 ? 0 : distancia / tramos[indice];
+          return [inicio[0] + (fin[0] - inicio[0]) * fraccion, inicio[1] + (fin[1] - inicio[1]) * fraccion];
+        }
+        distancia -= tramos[indice];
+      }
+      return puntosRuta[puntosRuta.length - 1];
+    };
     for (let indice = 0; indice < 7; indice += 1) {
-      const posicion = .1 + ((fase + indice / 7) % 1) * .8;
+      const progreso = (fase + indice / 7) % 1;
+      let px = w * (.1 + progreso * .8); let py = h * .5;
+      if (id === "ohm") {
+        const posicion = recorrerRuta([
+          [.2, .42], [.2, .28], [.53, .28], [.7, .28], [.82, .28],
+          [.82, .72], [.2, .72], [.2, .58]
+        ], progreso);
+        px = w * posicion[0]; py = h * posicion[1];
+      }
+      if (id === "circuitos" && tipo === "paralelo") {
+        const rama = indice % 3;
+        const yRama = .25 + rama * .25;
+        const posicion = recorrerRuta([
+          [.1, .5], [.2, .5], [.2, yRama], [.8, yRama], [.8, .5], [.9, .5]
+        ], progreso);
+        px = w * posicion[0]; py = h * posicion[1];
+      } else if (id === "circuitos" && tipo === "mixto") {
+        const rama = indice % 2; py = h * (rama === 0 ? .25 : .75);
+        if (progreso < .3) {
+          px = w * (.1 + progreso / .3 * .35); py = h * .5;
+        } else if (progreso < .4) {
+          px = w * .45; py = h * (.5 + (py / h - .5) * (progreso - .3) / .1);
+        } else if (progreso < .8) {
+          px = w * (.45 + (progreso - .4) / .4 * .35);
+        } else if (progreso < .9) {
+          px = w * .8; py = h * (py / h + (.5 - py / h) * (progreso - .8) / .1);
+        } else {
+          px = w * (.8 + (progreso - .9) / .1 * .1); py = h * .5;
+        }
+      }
       ctx.fillStyle = corriente > 0 ? "#f59e0b" : "#94a3b8";
-      ctx.beginPath(); ctx.arc(w * posicion, h * .5, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.fill();
     }
     ctx.fillStyle = "#172231"; ctx.font = "600 15px system-ui"; ctx.textAlign = "center"; ctx.fillText(`I = ${corriente.toFixed(2)} A · flujo de corriente`, w / 2, h * .25); return;
   }
@@ -589,8 +695,23 @@ function conectarControles(id) {
     }
     if (id === "circuitos") {
       // Algoritmo de resistencias en serie: Rtotal = R1 + R2; I = V / Rtotal.
-      const calc = () => { const r1 = Number(document.querySelector("#r1").value); const r2 = Number(document.querySelector("#r2").value); const fuente = Number(document.querySelector("#fuente").value); document.querySelector("#r1-salida").textContent = `${r1} Ω`; document.querySelector("#r2-salida").textContent = `${r2} Ω`; document.querySelector("#fuente-salida").textContent = `${fuente} V`; document.querySelector("#lectura").textContent = `I = ${calcularCorrienteSerie(fuente, r1, r2).toFixed(2)} A`; dibujar("circuitos", unidadActual.color); };
-      ["#r1","#r2","#fuente"].forEach((s) => document.querySelector(s).oninput = calc);
+      const calc = () => {
+        const tipo = document.querySelector("#tipo-circuito").value;
+        const resistencias = ["#r1", "#r2", "#r3"].map((selector) => Number(document.querySelector(selector).value));
+        const fuente = Number(document.querySelector("#fuente").value);
+        const circuito = calcularCircuitoResistivo(tipo, fuente, tipo === "serie" ? resistencias.slice(0, 2) : resistencias);
+        document.querySelector("#r1-salida").textContent = `${resistencias[0]} Ω`;
+        document.querySelector("#r2-salida").textContent = `${resistencias[1]} Ω`;
+        document.querySelector("#r3-salida").textContent = `${resistencias[2]} Ω`;
+        document.querySelector("#fuente-salida").textContent = `${fuente} V`;
+        document.querySelector("#control-r3").hidden = tipo === "serie";
+        document.querySelector("#modelo-circuito").textContent = `${tipo[0].toUpperCase()}${tipo.slice(1)} · Rₜ = ${circuito.resistenciaTotal.toFixed(2)} Ω`;
+        document.querySelector("#lectura").textContent = `I total = ${circuito.corrienteTotal.toFixed(2)} A`;
+        document.querySelector("#detalle-circuito").textContent = `V total ${fuente.toFixed(2)} V · P total ${circuito.potenciaTotal.toFixed(2)} W · R1: ${circuito.voltajes[0].toFixed(2)} V, ${circuito.corrientes[0].toFixed(2)} A, ${circuito.potencias[0].toFixed(2)} W · R2: ${circuito.voltajes[1].toFixed(2)} V, ${circuito.corrientes[1].toFixed(2)} A, ${circuito.potencias[1].toFixed(2)} W${tipo === "serie" ? "" : ` · R3: ${circuito.voltajes[2].toFixed(2)} V, ${circuito.corrientes[2].toFixed(2)} A, ${circuito.potencias[2].toFixed(2)} W`}`;
+        dibujar("circuitos", unidadActual.color);
+      };
+      ["#tipo-circuito", "#r1", "#r2", "#r3", "#fuente"].forEach((s) => document.querySelector(s).oninput = calc);
+      document.querySelector("#tipo-circuito").onchange = calc;
       const animarCircuito = (ahora) => { if (!document.querySelector("#circuitos")) return; estadoVisual.circuitos.fase = (ahora / 1800) % 1; dibujar("circuitos", unidadActual.color); estadoVisual.circuitos.animacion = requestAnimationFrame(animarCircuito); };
       calc(); estadoVisual.circuitos.animacion = requestAnimationFrame(animarCircuito);
     }
@@ -691,12 +812,14 @@ async function ejecutarPruebasModal() {
     iniciar.innerHTML = '<i class="ti ti-loader-2" aria-hidden="true"></i> Ejecutando...';
   }
   try {
-    const { calcularCapacitancia, calcularCorriente, calcularCorrienteSerie, calcularEnergia } = await import("../fisica/calculos.js");
+    const { calcularCapacitancia, calcularCorriente, calcularCorrienteSerie, calcularEnergia, calcularCircuitoResistivo } = await import("../fisica/calculos.js");
     const pruebas = [
       ["Capacitancia de aire", Math.abs(calcularCapacitancia(100, 2) - 4.427e-11) < 1e-14],
       ["Energía almacenada", Math.abs(calcularEnergia(100e-6, 12) - 0.0072) < 1e-12],
-      // ["Corriente en serie", calcularCorrienteSerie(12, 20, 30) === 0.24],
-      // ["Ley de Ohm", calcularCorriente(12, 6) === 2]
+      ["Corriente en serie", calcularCorrienteSerie(12, 20, 30) === 0.24],
+      ["Circuito paralelo", Math.abs(calcularCircuitoResistivo("paralelo", 12, [20, 30, 40]).resistenciaTotal - 9.230769) < 1e-5],
+      ["Circuito mixto", Math.abs(calcularCircuitoResistivo("mixto", 12, [20, 30, 30]).corrienteTotal - 12 / 35) < 1e-12],
+      ["Ley de Ohm", calcularCorriente(12, 6) === 2]
     ];
     const fallidas = pruebas.filter(([, correcto]) => !correcto);
     lista.innerHTML = pruebas.map(([nombre, correcto]) => `<li class="${correcto ? "correcta" : "fallida"}"><i class="ti ${correcto ? "ti-circle-check" : "ti-circle-x"}" aria-hidden="true"></i><span>${nombre}</span><strong>${correcto ? "Correcta" : "Revisar"}</strong></li>`).join("");
